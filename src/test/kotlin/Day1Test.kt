@@ -10,4 +10,10 @@ class Day1Test {
         val data = Util().readData("fred.txt")
         assertEquals(2,data.size)
     }
+
+    @Test
+    fun addTwoNumbers() {
+        val day1 = Day1()
+        assertEquals(3, day1.addTwoNumbers(1, 2))
+    }
 }
