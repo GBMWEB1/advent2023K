@@ -1,59 +1,60 @@
+
 class Day2 {
+    enum class Cube(val maxValue: Int){
+        RED(12),
+        BLUE( 14),
+        GREEN(13);
+    }
 
     companion object {
-        private const val MAX_RED = 12
-        private const val MAX_BLUE = 14
-        private const val MAX_GREEN = 13
 
-        //Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-        fun isGameValid(game: String): Boolean {
-            game.substringAfter(":").split(";").forEach {
-                if (!isRoundValid(it)) {
-                    return false
-                }
-            }
-            return true
-        }
-
-        private fun isRoundValid(round: String): Boolean{
-            val colours = round.split(",").map { it.trim() }
-            colours.forEach {
-                val colour = it.substringAfter(" ")
-                val quantity = it.substringBefore(" ").toInt()
-                when (colour) {
-                    "red" -> if (quantity> MAX_RED) return false
-                    "green" -> if (quantity> MAX_GREEN) return false
-                    "blue" -> if (quantity> MAX_BLUE) return false
-                }
-            }
-            return true
-        }
-
-        private fun getGameId(game: String): Int{
-            return  game.substringAfter("Game ").substringBefore(":").toInt()
-        }
-
+        // Part 1
         fun sumValidGames(games: List<String>): Int {
             return games
                 .filter { isGameValid(it) }
                 .sumOf { getGameId(it) }
         }
 
-        fun getMaxColour(line: String, colour: String): Int{
-            val instances = line.split(colour)
-            return instances.dropLast(1).maxOf {
-                it.trimEnd().substringAfterLast(" ").toInt()
-            }
+        fun isGameValid(game: String): Boolean {
+            return game.getRounds().all { isRoundValid(it) }
+        }
+
+        private fun String.getRounds(): List<String> {
+            return this.substringAfter(":").split(";")
+        }
+
+        private fun isRoundValid(round: String): Boolean{
+            return round
+                .split(",") // colours
+                .map { it.trim() }
+                .all {
+                    val colour = it.substringAfter(" ")
+                    val quantity = it.substringBefore(" ").toInt()
+                    val cube = Cube.valueOf(colour.uppercase())
+                    quantity <= cube.maxValue
+                }
+        }
+
+        private fun getGameId(game: String): Int{
+            return  game.substringAfter("Game ").substringBefore(":").toInt()
+        }
+
+        // Part 2
+        fun sumGamePowers(games: List<String>): Int {
+            return games.sumOf { getGamePower(it) }
         }
 
         fun getGamePower(game: String): Int {
-            return getMaxColour(game, "red") *
-                    getMaxColour(game, "blue") *
-                    getMaxColour(game, "green")
+            return game.getCubes(Cube.RED).max() *
+                    game.getCubes(Cube.BLUE).max() *
+                    game.getCubes(Cube.GREEN).max()
         }
 
-        fun sumGamePowers(games: List<String>): Int {
-            return games.sumOf { getGamePower(it) }
+        fun String.getCubes(cube: Cube): List<Int> {
+            return this
+                .split(cube.name.lowercase())
+                .dropLast(1)
+                .map { it.trimEnd().substringAfterLast(" ").toInt()}
         }
     }
 }

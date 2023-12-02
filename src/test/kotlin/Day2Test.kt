@@ -1,11 +1,12 @@
-import Day2.Companion.getMaxColour
+import Day2.Companion.getCubes
+import Day2.Cube
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 
 class Day2Test {
 
-    val games = listOf(
+    private val games = listOf(
         "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
         "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
         "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
@@ -31,9 +32,9 @@ class Day2Test {
 
     @Test
     fun samplePart2() {
-        assertEquals(4, getMaxColour(games[0], "red"))
-        assertEquals(2, getMaxColour(games[0], "green"))
-        assertEquals(6, getMaxColour(games[0], "blue"))
+        assertEquals(listOf(4,1), games[0].getCubes(Cube.RED))
+        assertEquals(listOf(2,2), games[0].getCubes(Cube.GREEN))
+        assertEquals(listOf(3,6), games[0].getCubes(Cube.BLUE))
 
         assertEquals(48, Day2.getGamePower(games[0]))
         assertEquals(12, Day2.getGamePower(games[1]))
@@ -41,7 +42,7 @@ class Day2Test {
         assertEquals(630, Day2.getGamePower(games[3]))
         assertEquals(36, Day2.getGamePower(games[4]))
 
-        assertEquals(2286, Day2.sumGamePowers(games),)
+        assertEquals(2286, Day2.sumGamePowers(games))
     }
 
     @Test
