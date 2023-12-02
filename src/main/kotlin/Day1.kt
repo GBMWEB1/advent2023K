@@ -4,11 +4,12 @@ class Day1 {
         private var digits = listOf("zero","one","two","three","four","five","six","seven","eight","nine")
         fun getValues(line: String): Int {
 
+
             val values = mutableListOf<Int>()
             var lettersSoFar = ""
             for (char in line) {
                 if (char.isDigit()) {
-                    values.add(char.toString().toInt())
+                    values.add(char.digitToInt())
                     lettersSoFar = ""
                 }
                 else {
@@ -28,8 +29,4 @@ class Day1 {
             return line.sumOf { getValues(it) }
         }
     }
-
-
-
-
 }
