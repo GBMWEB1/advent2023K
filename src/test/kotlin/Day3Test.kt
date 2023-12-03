@@ -1,7 +1,4 @@
-import Day2.Companion.getCubes
-import Day2.Cube
 import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.Assertions.*
 
 class Day3Test {
@@ -19,39 +16,44 @@ class Day3Test {
         ".664.598..",
     )
     @Test
-    fun extractNonDigits() {
+    fun debugDigits() {
         val data = Util().readData("day3.txt")
-        Day3.extractDigits(data)
-        Day3.extractAll(data)
+
+        val digits = mutableSetOf<Char>()
+        val chars = mutableSetOf<Char>()
+        data.forEach { row ->
+            row.forEach { bit -> if (!bit.isDigit()) digits.add(bit) }
+            row.forEach { bit -> chars.add(bit) }
+        }
+        println(digits)
+        println(chars)
     }
 
     @Test
     fun samplePart1() {
-       assertEquals(4361, Day3.sumValidGames(games))
+       assertEquals(4361, Day3(games).sumValidGames())
 
-        assertEquals(0, Day3.sumValidGames(
-            listOf(
-                "....",
-                ".56.",
-                "....")
+        assertEquals(0, Day3(listOf(
+            "....",
+            ".56.",
+            "....")).sumValidGames(
         ))
-        assertEquals(/* expected = */ 56, /* actual = */ Day3.sumValidGames(
-            listOf(
-                "..-.",
-                ".56.",
-                "....")
+        assertEquals(/* expected = */ 56, /* actual = */
+            Day3(listOf(
+            "..-.",
+            ".56.",
+            "....")).sumValidGames(
         ))
-        assertEquals(/* expected = */ 56, /* actual = */ Day3.sumValidGames(
-            listOf(
-                "..-",
-                "..56",
-                "....")
+        assertEquals(/* expected = */ 56, /* actual = */ Day3(listOf(
+            "..-",
+            "..56",
+            "....")).sumValidGames(
         ))
     }
     @Test
     fun part1() {
         val data = Util().readData("day3.txt")
-        assertEquals(560670, Day3.sumValidGames(data))
+        assertEquals(560670, Day3(data).sumValidGames())
     }
 
     // Part 2
@@ -91,7 +93,7 @@ class Day3Test {
 
     @Test
     fun extractParts() {
-        val parts = Day3.Part.extractPartsFromLine("467..114..", 1);
+        val parts = Day3.Part.extractPartsFromLine(1, "467..114..")
         assertEquals(2, parts.size)
         assertEquals(467, parts[0].value)
         assertEquals(1, parts[0].row)
@@ -102,17 +104,16 @@ class Day3Test {
         assertEquals(5, parts[1].startCol)
 
         assertEquals(2, parts.size)
-
     }
 
     @Test
-    fun samplePart2() {
-        assertEquals(467835, Day3.getGears(games).sum())
+    fun sampleGearsPart2() {
+        assertEquals(467835, Day3(games).getGears().sum())
     }
 
     @Test
     fun part2() {
         val data = Util().readData("day3.txt")
-        assertEquals(91622824,  Day3.getGears(data).sum())
+        assertEquals(91622824,  Day3(data).getGears().sum())
     }
 }
