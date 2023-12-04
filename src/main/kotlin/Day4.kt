@@ -25,6 +25,7 @@ class Day4(lines: List<String>) {
                     .split(" ")
                     .filter { it.isNotEmpty() }
                     .map { it.toInt() }
+                    .toSet()
                 return Card(winningNumbers.intersect(cardNumbers).size)
             }
         }
@@ -35,7 +36,7 @@ class Day4(lines: List<String>) {
         return cards.sumOf { it.getPoints() }
     }
 
-    fun part2(): Int {
+    fun countCards(): Int {
         cards.forEachIndexed { index, card ->
             for (x in 1..card.matches ){
                 cards[index+x].incrementCount(card.count)

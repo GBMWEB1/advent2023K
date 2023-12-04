@@ -1,5 +1,8 @@
 class Day1 {
 
+    // Part 1 - Search for digits either end
+    // Part 2 - Search for the word "one" or digits from either end
+
     companion object {
         private var digits = listOf("zero","one","two","three","four","five","six","seven","eight","nine")
         fun getValues(line: String): Int {

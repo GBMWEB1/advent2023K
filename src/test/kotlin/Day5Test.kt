@@ -2,7 +2,7 @@ import Day4.Card
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
-class Day4Test {
+class Day5Test {
 
     private val sample = listOf(
         "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
@@ -15,28 +15,19 @@ class Day4Test {
 
     @Test
     fun samplePart1(){
-        assertEquals(8, Card.fromLine(sample[0]).getPoints())
-        assertEquals(2, Card.fromLine(sample[1]).getPoints())
-        assertEquals(2, Card.fromLine(sample[2]).getPoints())
-        assertEquals(1, Card.fromLine(sample[3]).getPoints())
-        assertEquals(0, Card.fromLine(sample[4]).getPoints())
-        assertEquals(0, Card.fromLine(sample[5]).getPoints())
     }
 
     @Test
     fun part1() {
-        val data = Util().readData("day4.txt")
-        assertEquals(26346,  Day4(data).sumScore())
+        val data = Util().readData("day5.txt")
     }
 
     @Test
     fun part2Sample() {
-        assertEquals(30,  Day4(sample).countCards())
     }
 
     @Test
     fun part2() {
         val data = Util().readData("day4.txt")
-        assertEquals(8467762,  Day4(data).countCards())
     }
 }
