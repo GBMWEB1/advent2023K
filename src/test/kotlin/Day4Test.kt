@@ -45,6 +45,6 @@ class Day4Test {
     @Test
     fun part2() {
         val data = Util().readData("day4.txt")
-        assertEquals(30,  Day4.part2(data))
+        assertEquals(8467762,  Day4.part2(data))
     }
 }
