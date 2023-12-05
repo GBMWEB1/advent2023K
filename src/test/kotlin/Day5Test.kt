@@ -1,7 +1,6 @@
-import Day4.Card
 import Day5.Range
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 
 class Day5Test {
 
@@ -19,7 +18,7 @@ class Day5Test {
     @Test
     fun samplePart1(){
         val data = Util().readData("day5Sample.txt")
-        val day5 = Day5.fromList(data);
+        val day5 = Day5.fromList(data)
 
         assertEquals(82, day5.findLocation(79))
         assertEquals(43, day5.findLocation(14))
@@ -32,14 +31,14 @@ class Day5Test {
     @Test
     fun part1() {
         val data = Util().readData("day5.txt")
-        val day5 = Day5.fromList(data);
+        val day5 = Day5.fromList(data)
         assertEquals(226172555, day5.findLowestLocation())
     }
 
     @Test
     fun part1Sample() {
         val data = Util().readData("day5Sample.txt")
-        val day5 = Day5.fromList(data);
+        val day5 = Day5.fromList(data)
         assertEquals(46, day5.findLowestLocationAsSeedPair())
     }
 
@@ -72,14 +71,14 @@ class Day5Test {
     @Test
     fun part2Sample() {
         val data = Util().readData("day5Sample.txt")
-        val day5 = Day5.fromList(data);
+        val day5 = Day5.fromList(data)
         assertEquals(46, day5.findLowestLocationAsSeedPair())
     }
 
     @Test
     fun part2() {
         val data = Util().readData("day5.txt")
-        val day5 = Day5.fromList(data);
+        val day5 = Day5.fromList(data)
         assertEquals(47909639, day5.findLowestLocationAsSeedPair())
     }
 }

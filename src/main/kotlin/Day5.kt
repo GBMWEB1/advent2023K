@@ -14,7 +14,7 @@ class Day5(
         val end = start+ duration-1
 
         fun isInRange(value: Long): Boolean {
-            return start<= value && value <= end
+            return value in start..end
         }
     }
 
@@ -38,7 +38,7 @@ class Day5(
             val ranges = mutableListOf<Range>()
             var durationLeft = value.duration
             while (durationLeft>0){
-                var currentValue = value.start + (value.duration - durationLeft)
+                val currentValue = value.start + (value.duration - durationLeft)
 
                 val foundRanges = mappings.filter { it.value.isInRange(currentValue) }.toList()
                 if (foundRanges.isNotEmpty()){
@@ -54,16 +54,15 @@ class Day5(
                     ranges.add(Range(start, duration))
                     durationLeft -= duration
                 } else{
-                    // calculate end as passedInRange end or if there is a later range, use this
+                    // No range to use, so create one until the next available range(if possible)
                     var end = value.end
                     val nextRange = mappings.filter { currentValue< it.value.start}.toList().sortedBy { it.second.start }
                     if (nextRange.isNotEmpty()){
                         end = (nextRange[0].second.start - 1).coerceAtMost(value.end)
                     }
-                    val start = currentValue
-                    val duration = end-start+1
+                    val duration = end - currentValue + 1
 
-                    ranges.add(Range(start, duration))
+                    ranges.add(Range(currentValue, duration))
 
                     durationLeft -= duration
                 }
@@ -132,7 +131,7 @@ class Day5(
 
         private fun findLines(mapToFind: String, data: List<String>): List<String> {
             var active= false
-            val lines = mutableListOf<String>();
+            val lines = mutableListOf<String>()
             data.forEach {
                 if (it.startsWith(mapToFind)){
                     active = true
