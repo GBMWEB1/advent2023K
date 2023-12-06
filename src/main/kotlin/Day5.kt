@@ -35,10 +35,10 @@ class Day5(
 
         // part 2
         fun findTargets(value: Range): List<Range> {
-            val ranges = mutableListOf<Range>()
-            var durationLeft = value.duration
-            while (durationLeft>0){
-                val currentValue = value.start + (value.duration - durationLeft)
+            val targetRanges = mutableListOf<Range>()
+            while (targetRanges.sumOf { it.duration } < value.duration){
+
+                val currentValue = value.start + targetRanges.sumOf { it.duration }
 
                 val foundRanges = mappings.filter { it.value.isInRange(currentValue) }.toList()
                 if (foundRanges.isNotEmpty()){
@@ -50,9 +50,9 @@ class Day5(
                         start += startOffset
                         duration -= startOffset
                     }
+                    val durationLeft = value.duration - targetRanges.sumOf { it.duration }
                     duration = duration.coerceAtMost(durationLeft)
-                    ranges.add(Range(start, duration))
-                    durationLeft -= duration
+                    targetRanges.add(Range(start, duration))
                 } else{
                     // No range to use, so create one until the next available range(if possible)
                     var end = value.end
@@ -62,12 +62,10 @@ class Day5(
                     }
                     val duration = end - currentValue + 1
 
-                    ranges.add(Range(currentValue, duration))
-
-                    durationLeft -= duration
+                    targetRanges.add(Range(currentValue, duration))
                 }
             }
-            return ranges
+            return targetRanges
         }
 
         companion object{
