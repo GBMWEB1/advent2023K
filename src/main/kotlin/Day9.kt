@@ -1,4 +1,4 @@
-class Day9(private val readings: List<MutableList<Int>>) {
+class Day9(private val readings: List<List<Int>>) {
 
     companion object {
         fun ofList(input:  List<String>): Day9 {
@@ -20,16 +20,12 @@ class Day9(private val readings: List<MutableList<Int>>) {
     }
 
     // part 1
-    fun sumHistory(): Int {
-        return readings.sumOf { getHistory(it)  }
+    fun sumNextValues(): Int {
+        return readings.sumOf { calculateNextValue(expandToList(it))  }
     }
 
-    private fun getHistory(inputRow: List<Int>): Int {
-        return calculateNextValue(expandToList(inputRow))
-    }
-
-    private fun expandToList(inputRow: List<Int>): List<List<Int>> {
-        val rows = mutableListOf(inputRow)
+    private fun expandToList(row: List<Int>): List<List<Int>> {
+        val rows = mutableListOf(row)
         while (rows.last().any { it != 0 }) {
             rows.add(createRow(rows.last()))
         }
@@ -54,24 +50,18 @@ class Day9(private val readings: List<MutableList<Int>>) {
         return readingRows.last().last()
     }
 
-
     // part 2
-    fun sumLeftHistory(): Int {
-        return readings.sumOf { getFirstValue(it)  }
+    fun sumFirstValue(): Int {
+        return readings.sumOf { calculateFirstValue(expandToList(it)) }
     }
 
-    private fun getFirstValue(inputRow: List<Int>): Int {
-        return calculateFirstValue(expandToList(inputRow))
-    }
-
-    private fun calculateFirstValue(rows: List<List<Int>>): Int {
-        val readingRows = rows.map { it.toMutableList() }.reversed()
-        readingRows[0].add(0)
-        for (x in 0..readingRows.size-2){
-            val newValue = readingRows[x+1].first() - readingRows[x].first()
-            readingRows[x+1].add(0, newValue)
+    private fun calculateFirstValue(expandedList: List<List<Int>>): Int {
+        val rows = expandedList.map { it.toMutableList() }.reversed()
+        rows[0].add(0)
+        for (x in 0..rows.size-2){
+            val newValue = rows[x+1].first() - rows[x].first()
+            rows[x+1].add(0, newValue)
         }
-        return readingRows.last().first()
+        return rows.last().first()
     }
-
 }
