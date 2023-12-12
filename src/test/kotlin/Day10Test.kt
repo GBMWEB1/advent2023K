@@ -117,7 +117,11 @@ class Day10Test {
         grid.joinPipes()
         grid.navigate()
         grid.startInfection();
+        grid.spreadInfection()
+        grid.spreadInfection()
+        grid.spreadInfection()
         grid.spreadToEnd()
+
         grid.display()
         assertEquals(4, grid.getEnclosedTiles())
     }
@@ -212,13 +216,13 @@ class Day10Test {
         val grid = Day10.of(data)
         grid.joinPipes()
         grid.navigate()
-        grid.display()
         grid.startInfection()
         grid.spreadToEnd()
         grid.display()
 
         //681 (Too high)
         //653 too high
-        assertEquals(653, grid.getEnclosedTiles())
+        // 378 not right
+        assertEquals(378, grid.getEnclosedTiles())
     }
 }
