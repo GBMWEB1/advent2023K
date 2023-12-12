@@ -1,3 +1,5 @@
+import kotlin.math.min
+
 class Day11(private val universe: List<String>) {
     var galaxies = Galaxy.from(universe)
     var pairs = calcPairs()

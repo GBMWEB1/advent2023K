@@ -183,6 +183,9 @@ class Day10(private val grid: List<List<Pipe>>) {
                     if (cell.type!='.'){
                         cell.verticalGap = true
                     }
+                    if (nextCell.type!= '.'){
+                        nextCell.verticalGap = true
+                    }
                 }
             }
         }
@@ -195,6 +198,9 @@ class Day10(private val grid: List<List<Pipe>>) {
                     listOf('F','-','7','.').contains(nextCell.type)){
                     if (cell.type!='.'){
                         cell.horizontalGap = true
+                    }
+                    if (nextCell.type!='.'){
+                        nextCell.horizontalGap = true
                     }
                 }
             }
@@ -256,10 +262,10 @@ class Day10(private val grid: List<List<Pipe>>) {
                     nextInfected.add(upperCell)
                 } else {
                     while (upperCell.verticalGap && upperCell.y > 0) {
-                        var rightCell = grid[upperCell.y][upperCell.x + 1]
-                        if (rightCell.type == '.') {
-                            nextInfected.add(rightCell)
-                        }
+//                        var rightCell = grid[upperCell.y][upperCell.x + 1]
+//                        if (rightCell.type == '.') {
+//                            nextInfected.add(rightCell)
+//                        }
                         upperCell = grid[upperCell.y - 1][upperCell.x]
                     }
                     if (!upperCell.infected && !upperCell.verticalGap) {
@@ -275,10 +281,10 @@ class Day10(private val grid: List<List<Pipe>>) {
                     nextInfected.add(lowerCell)
                 } else {
                     while (lowerCell.verticalGap && lowerCell.y < grid.size - 1) {
-                        var rightCell = grid[lowerCell.y][lowerCell.x + 1]
-                        if (rightCell.type == '.' && !rightCell.infected) {
-                            nextInfected.add(rightCell)
-                        }
+//                        var rightCell = grid[lowerCell.y][lowerCell.x + 1]
+//                        if (rightCell.type == '.' && !rightCell.infected) {
+//                            nextInfected.add(rightCell)
+//                        }
                         lowerCell = grid[lowerCell.y + 1][lowerCell.x]
                     }
                     if (!lowerCell.infected && !lowerCell.verticalGap) {
