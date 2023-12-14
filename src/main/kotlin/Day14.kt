@@ -173,11 +173,6 @@ class Day14(var grid: MutableList<String>) {
                 scores[x+13]== scores[13] &&
                 scores[x+14]== scores[14] &&
                 scores[x+15]== scores[15]
-//                scores[x+16]== scores[16] &&
-//                scores[x+17]== scores[17] &&
-//                scores[x+18]== scores[18] &&
-//                scores[x+19]== scores[19] &&
-//                scores[x+20]== scores[20]
             ){
                 for (score in 0..<x){
                     rep.add(scores[score])
