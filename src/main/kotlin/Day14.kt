@@ -147,7 +147,8 @@ class Day14(var grid: MutableList<String>) {
 
     private fun cycleTimes(count: Int): List<Int> {
         val scores = mutableListOf<Int>()
-        (1..count).forEach {
+
+        repeat(count){
             cycle()
             scores.add(getScore())
         }

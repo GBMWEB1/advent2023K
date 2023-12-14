@@ -26,20 +26,29 @@ class Day12Test {
 //      ##..#
 //      ##.#.
 //      .##.#
-        assertEquals(6, Day12.getCombinations2("??????", listOf(2,1)))
+        assertEquals(7, Day12.getCombinations2("??????", listOf(2,1)))
         //##...#
         //##..#.
         //##.#..
         //.##..#
         //.##.#.
         //..##..#
-
-
-
+        //...##.#
 
         assertEquals(10, Day12.getCombinations2("???????", listOf(2,1)))
+        //##....#
+        //##...#.
+        //##..#..
+        //##.#...
 
+        //.##...#
+        //.##..#.
+        //.##.#..
 
+        //..##..#
+        //..##.#.
+
+        //...##.#
 
         assertEquals(10, Day12.getCombinations2("?###????????", listOf(3,2,1)))
     }

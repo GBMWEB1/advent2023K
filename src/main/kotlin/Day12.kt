@@ -89,66 +89,89 @@ class Day12() {
 
             var patternExplored : String = ""
 
-            fun explore(): List<Option> {
-
-                if (pattern == listOf("#","?")){
-                    println()
-                }
-
+            fun isFinished(): Boolean {
+                return pattern.size==0 && numbers.size==0
+            }
+            fun isValid(): Boolean{
                 if (pattern.size==0){
-                    return listOf(this)
+                    if (numbers.size==0){
+                        return true
+                    }
+                    return false
                 }
-                patternExplored = pattern[0]
 
                 // Matched the numbers, but there are still ones
                 if (numbers.size==0){ // we have matched all the numbers, but there are still
                     // any of the pattern remaining
                     if (pattern.any { it.contains('#')}) {
-                        return listOf()
+                        return false
                     }
-                    return listOf(Option(listOf(), numbers))
+                    return true
                 }
 
-                // we still have numbers to match
-                // check that the current pattern is possible
                 var question = pattern[0].indexOf('?')
                 if (question > numbers[0]){
-                    return listOf()
+                    return false
                 }
 
-                // Can't possibly match
-                if (numbers[0]> pattern[0].length){
-                    // can't match this pattern, but other may
-                    if (pattern.size>1) {
-                        return listOf(Option(pattern.drop(1), numbers))
+                val minSize = numbers.sum() + numbers.size-1
+                if (pattern.size==1 && pattern[0].length< minSize){
+                    return false
+                }
+                return true
+
+            }
+
+            fun explore(): List<Option> {
+                if (pattern == listOf("#?????")){
+                    println()
+                }
+                if (isFinished()){
+                    return listOf(this)
+                }
+
+                if (!isValid()){
+                   return listOf()
+                }
+
+                patternExplored = pattern[0]
+
+                if (numbers.size==0){
+                    if (!patternExplored.contains("#")){
+                        return listOf(Option(listOf(), listOf()))
                     }
-                    return listOf()
                 }
 
-                val unknowns = pattern[0].count { it=='?' }
+                if (numbers[0]> patternExplored.length){
+                    if (pattern.size==1){
+                        return listOf()
+                    }
+                    // can't match in this pattern, but other may
+                    return listOf(Option(pattern.drop(1), numbers))
+                }
 
                 // direct match
-                if (numbers[0] == pattern[0].length && unknowns==0){
+                if (numbers[0] == patternExplored.length){
                     return listOf(Option(pattern.drop(1), numbers.drop(1)))
                 }
 
                 var options = mutableListOf<Option>()
-                if (unknowns>0){
+                var question = pattern[0].indexOf('?')
+
+                if (question>-1){
 
                     var beforeQuestion  = pattern[0].substring(0,question)
-
-                    var newPatternsWithOutSpring = mutableListOf<String>()
-
-                    if (beforeQuestion.isNotEmpty()){
-                        newPatternsWithOutSpring.add(beforeQuestion)
+                    if (beforeQuestion.isEmpty()){
+                        options.add(Option(pattern.drop(1), numbers))
                     }
-                    if (question != pattern[0].length-1){
-                        newPatternsWithOutSpring.add(pattern[0].substring(question+1))
+                    if (beforeQuestion.length> 0 && beforeQuestion.length == numbers[0]) {
+                        options.add(Option(pattern.drop(1), numbers))
                     }
-                    newPatternsWithOutSpring.addAll(pattern.drop(1))
-                    options.add(Option(newPatternsWithOutSpring, numbers))
-                    //
-                    var newPatternsWithSpring = mutableListOf(pattern[0].replaceFirst('?','#'))
+
+                    // add if it wasn't a space
+                    var newPatternWithSpring = pattern[0].replaceFirst('?','#')
+
+                    var newPatternsWithSpring = mutableListOf<String>(newPatternWithSpring)
                     newPatternsWithSpring.addAll(pattern.drop(1))
                     options.add(Option(newPatternsWithSpring, numbers))
                 }
