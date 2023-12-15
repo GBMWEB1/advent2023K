@@ -1,7 +1,7 @@
-import javax.management.Query
 import kotlin.math.pow
 
-class Day12() {
+class Day12B() {
+
     companion object{
         fun getCombinations(s: String, groups: List<Int>): Int {
             // so any question mark can be a combination of # or .
@@ -78,7 +78,7 @@ class Day12() {
             foldedNumbers.addAll(numbers)
             foldedNumbers.addAll(numbers)
 
-            return getCombinations2(foldPattern(pattern), foldedNumbers)
+            return getCombo(foldPattern(pattern), foldedNumbers)
         }
 
         fun sumCombinations(data: List<String>): Int {
@@ -131,7 +131,7 @@ class Day12() {
                 }
 
                 if (!isValid()){
-                   return listOf()
+                    return listOf()
                 }
 
                 patternExplored = pattern[0]
@@ -175,72 +175,90 @@ class Day12() {
                     newPatternsWithSpring.addAll(pattern.drop(1))
                     options.add(Option(newPatternsWithSpring, numbers))
                 }
-
-                // each unknown can be on or off.
-                // if off, add new option - adding to the pattern
-//
-//                for (c in 0.. pattern[0].length-1){
-//                    if (pattern[0][c]=='?'){
-//                        if (currentPattern.isNotEmpty()){ // not filled in
-//                            var newPatterns = mutableListOf<String>(currentPattern)
-//                            if (c< pattern[0].length-1){
-//                                newPatterns.add(pattern[0].substring(c+1))
-//                            }
-//                            newPatterns.addAll(pattern.drop(1))
-//                            options.add(Option(newPatterns, numbers))
-//                        } else{
-//                            currentPattern = currentPattern+'#'
-//                        }
-//                    } else{
-//                        currentPattern = currentPattern+pattern[0][c]
-//                    }
-//                }
-
-
-//                val max = 2.toDouble().pow(unknowns).toInt()-1
-//                for (x in 0.. max) {
-//                    var patterToInject =
-//                        Integer.toBinaryString(x)!!.padStart(unknowns, '0').map { mapChar(it) }
-//
-//                    val replacedString = replaceString(pattern[0], patterToInject)
-//                    val groups = getGroups(replacedString)
-//                    if (groups.size> numbers.size){
-//                        continue
-//                    }
-//                    if (groups.size==0){
-//                        options.add(Option(pattern.drop(1), numbers))
-//                    } else{
-//                        val groupsToMatch = numbers.toList().subList(0, groups.size)
-//                        if (groups == groupsToMatch) {
-//                            options.add(Option(pattern.drop(1), numbers.drop(groups.size)))
-//                        }
-//                    }
-//                }
                 return options.toList()
             }
         }
 
 
-        fun getCombinations2(s: String, numbers: List<Int>): Int {
-
-            val groups = s.split(".").filter { it.length>0 }
-
-            var options = listOf<Option>(Option(groups, numbers))
-            while (options.any { it.pattern.size >0 }){
-                options = options.flatMap { it.explore() }
+        fun getCombo(s: String, numbers: List<Int>): Int {
+            var options = listOf(s);
+            println("Starting $s")
+            while (options.any { it.contains("?") }){
+                options = options.flatMap { mutateOption(it) }.filter { isValid(it, numbers) }
             }
-            var num = options.filter { it.numbers.size==0 && it.pattern.size==0 }
-            return num.size
+            return options.size
+        }
+
+        private fun isValid(it: String, numbers: List<Int>): Boolean {
+            var groupRocks = firstRocks(it)
+            if (it.contains("?")){
+                val good = groupRocks.first == numbers.take(groupRocks.first.size)
+                if (!good){
+                    return false;
+                }
+                // checl the next one:
+                val nextOne = numbers.drop(groupRocks.first.size).take(1)
+                if (groupRocks.second > nextOne[0]){
+                    return false
+                }
+                return true;
+            }
+            return groupRocks == numbers
+
+        }
+
+        private fun firstRocks(it: String) : Pair<List<Int>,Int> {
+            var rocks = mutableListOf<Int>()
+            var currentRocks = 0
+            for (pos in 0..<it.length){
+                if (it[pos]=='#'){
+                    currentRocks++
+                } else if (it[pos]=='.'){
+                    if (currentRocks>0) {
+                        rocks.add(currentRocks)
+                    }
+                    currentRocks=0
+                } else{ // question mark
+                    return Pair(rocks.toList(),currentRocks)
+                }
+            }
+            if( currentRocks>0){
+                rocks.add(currentRocks)
+            }
+            return Pair(rocks.toList(),0)
+        }
+
+        private fun justRocks(it: String) : String {
+            return it.filter { it!= '?' }
+        }
+
+        private fun mutateOption(it: String): List<String> {
+            if (!it.contains("?")){
+                return listOf(it);
+            }
+            val question = it.indexOfFirst { it =='?'}
+            val option1 = replaceQuestion(it, question, '.')
+            val option2 = replaceQuestion(it, question, '#')
+
+            return listOf(option1, option2)
+        }
+
+        private fun replaceQuestion(it: String, question: Int, c: Char): String {
+            return it.substring(0, question)  + c + it.substring(question+1)
         }
 
         fun getCombinations2(s: String): Int{
             val numbers = s.substringAfter(" ").split(",").map { it.toInt() }
             val pattern = s.substringBefore(" ")
-            return getCombinations2(pattern, numbers)
+            return getCombo(pattern, numbers)
         }
 
         fun sumCombinations2(data: List<String>): Int {
             return data.sumOf { getCombinations2(it) }
+        }
+
+        fun sumCombinationsFolded(data: List<String>): Int {
+            return data.sumOf { getCombinationsFolded(it) }
         }
     }
 }
