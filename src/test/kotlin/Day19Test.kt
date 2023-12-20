@@ -53,8 +53,6 @@ class Day19Test {
         range.lessThan=3
         range.greaterThan=1
         assertEquals(1,range.count())
-
-
     }
 
     @Test
@@ -79,7 +77,7 @@ class Day19Test {
 
     @Test
     fun sampleRule() {
-       val data = Util().readData("day19Sample.txt")
+        val data = Util().readData("day19Sample.txt")
         val day19 = Day19(data)
         assertEquals(167409079868000, day19.evaluateWorkflowOptions())
     }
