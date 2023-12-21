@@ -1,4 +1,4 @@
-class Day9(private val readings: List<List<Int>>) {
+class Day9(private val readings: List<List<Int>> = listOf()) {
 
     companion object {
         fun ofList(input:  List<String>): Day9 {
@@ -40,7 +40,7 @@ class Day9(private val readings: List<List<Int>>) {
         return newRow
     }
 
-    private fun calculateNextValue(rows: List<List<Int>>): Int{
+    fun calculateNextValue(rows: List<List<Int>>): Int{
         val readingRows = rows.map { it.toMutableList() }.reversed()
         readingRows[0].add(0)
         for (x in 0..readingRows.size-2){

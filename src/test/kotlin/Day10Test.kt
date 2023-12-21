@@ -15,11 +15,8 @@ class Day10Test {
     fun sample1(){
     val grid = Day10.of(sample1)
         grid.joinPipes()
-        var pipe = grid.getStartingPipe();
-        assertEquals(2, pipe.prev().x)
-        assertEquals(1, pipe.prev().y)
 
-        pipe = grid.getPipe(1, 2)!!
+        var pipe = grid.getPipe(1, 2)!!
         assertEquals('|', pipe.type)
         assertEquals('S', pipe.prev().type)
         assertEquals('L', pipe.next().type)
@@ -87,15 +84,9 @@ class Day10Test {
         ))
         grid.joinPipes()
         grid.navigate()
+        grid.expand()
         grid.display()
         grid.startInfection();
-        grid.display()
-        grid.spreadInfection();
-        grid.display()
-        grid.spreadInfection();
-        grid.display()
-        grid.spreadInfection();
-        grid.display()
         grid.spreadToEnd()
         grid.display()
         assertEquals(4, grid.getEnclosedTiles())
@@ -216,6 +207,7 @@ class Day10Test {
         val grid = Day10.of(data)
         grid.joinPipes()
         grid.navigate()
+        grid.clearPipes()
         grid.startInfection()
         grid.spreadToEnd()
         grid.display()
@@ -225,4 +217,9 @@ class Day10Test {
         // 378 not right
         assertEquals(378, grid.getEnclosedTiles())
     }
+
+    // Double resolution
+    //             ...
+    //  F becomes  .F-
+    //             .|.
 }

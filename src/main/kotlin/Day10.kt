@@ -1,4 +1,4 @@
-class Day10(private val grid: List<List<Pipe>>) {
+class Day10(private var grid: List<List<Pipe>>) {
 
     private var currentInfection = listOf<Pipe>()
 
@@ -10,7 +10,7 @@ class Day10(private val grid: List<List<Pipe>>) {
             for (y in 0.. data.size-1){
                 var row = mutableListOf<Pipe>()
                 data[y].forEachIndexed { x, c ->
-                    row.add(Pipe(c, x, y))
+                    row.add(Pipe(c))
                 }
                 pipes.add(row)
             }
@@ -18,17 +18,7 @@ class Day10(private val grid: List<List<Pipe>>) {
         }
     }
 
-    class Pipe(var type : Char, val x: Int, val y : Int){
-        private var infectBottom: Boolean = false
-        private var infectLeft: Boolean = false
-        private var infectRight: Boolean = false
-        private var infectTop: Boolean = false
-
-        var leftGap: Boolean = false
-        var rightGap: Boolean = false
-        var topGap: Boolean = false
-        var bottomGap: Boolean = false
-
+    class Pipe(var type : Char){
         var navigated =false
         var enclosed: Boolean = false
 
@@ -64,180 +54,41 @@ class Day10(private val grid: List<List<Pipe>>) {
             return next()
         }
 
-        fun infectFromTop(): Boolean{
-            if (infectTop){
-                return false;
-            } else{
-                infectTop=true
-            }
-            if (type=='.' || !navigated){
-                infectLeft = true
-                infectRight= true
-                infectBottom = true
-                infected = true;
-                return true
-            }
-            else if (topGap){
-                if (rightGap){
-                    infectRight = true;
-                }
-                if (leftGap){
-                    infectLeft = true;
-                }
-                return true;
-            }
-            return false
-        }
-
-        fun infectFromBottom(): Boolean {
-            if (infectBottom){
-                return false;
-            } else{
-                infectBottom=true
-            }
-            if (type=='.' || !navigated){
-                infectLeft = true
-                infectRight= true
-                infectTop = true
-                infected = true;
-                return true
-            }
-            else if (bottomGap){
-                if (rightGap){
-                    infectRight = true;
-                }
-                if (leftGap){
-                    infectLeft = true;
-                }
-            }
-            return true
-        }
-
-        fun infectFromLeft(): Boolean {
-            if (infectLeft){
-                return false;
-            } else{
-                infectLeft=true
-            }
-            if (type=='.' || !navigated){
-                infectRight= true
-                infectTop = true
-                infectBottom = true
-                infected = true
-                return true
-            }
-            else if (leftGap){
-                if (topGap){
-                    infectTop = true;
-                }
-                if (bottomGap){
-                    infectBottom = true;
-                }
-                if (type=='.'){
-                    infectRight = true
-                }
-                return true
-            }
-            return false
-        }
-
-        fun infectFromRight(): Boolean {
-            if (infectRight){
-                return false;
-            } else{
-                infectRight=true
-            }
-
-            if (type=='.' || !navigated){
-                infectLeft = true
-                infectTop = true
-                infectBottom = true
-                infected = true
-                return true
-            }
-            else if (rightGap){
-                if (topGap){
-                    infectTop = true;
-                }
-                if (bottomGap){
-                    infectBottom = true;
-                }
-                return true;
-            }
-            return false
-        }
-
         fun spreadInfection() : List<Pipe>{
             var spread = mutableListOf<Pipe>()
-            if (x==4 && y==7){
-                println()
-            }
-            if (infectTop) {
-                if (topPipe!= null && topPipe!!.bottomGap && topPipe!!.infectFromBottom()) {
-                    spread.add(topPipe!!)
-                }
-                if (leftPipe!= null && leftPipe!!.topGap && leftPipe!!.infectFromTop()) {
-                    spread.add(leftPipe!!)
-                }
-                if (rightPipe!= null && rightPipe!!.topGap && rightPipe!!.infectFromTop()) {
-                    spread.add(rightPipe!!)
-                }
 
-            }
-            if (infectBottom) {
-                if (bottomPipe!= null && bottomPipe!!.topGap && bottomPipe!!.infectFromTop()) {
-                    spread.add(bottomPipe!!)
-                }
-                if (leftPipe!= null && leftPipe!!.bottomGap && leftPipe!!.infectFromBottom()) {
-                    spread.add(leftPipe!!)
-                }
-                if (rightPipe!= null && rightPipe!!.bottomGap && rightPipe!!.infectFromBottom()) {
-                    spread.add(rightPipe!!)
-                }
-            }
-
-            if (infectLeft) {
-                if (leftPipe!= null && leftPipe!!.rightGap && leftPipe!!.infectFromRight()) {
-                    spread.add(leftPipe!!)
-                }
-                if (topPipe!= null && topPipe!!.leftGap && topPipe!!.infectFromLeft()) {
-                    spread.add(topPipe!!)
-                }
-                if (bottomPipe!= null && bottomPipe!!.leftGap && bottomPipe!!.infectFromLeft()) {
-                    spread.add(bottomPipe!!)
-                }
-            }
-
-            if (infectRight) {
-                if (rightPipe!= null && rightPipe!!.leftGap && rightPipe!!.infectFromLeft()) {
-                    spread.add(rightPipe!!)
-                }
-                if (topPipe!= null && topPipe!!.rightGap && topPipe!!.infectFromRight()) {
-                    spread.add(topPipe!!)
-                }
-                if (bottomPipe!= null && bottomPipe!!.rightGap && bottomPipe!!.infectFromRight()) {
-                    spread.add(bottomPipe!!)
-                }
-            }
+            // need to right code to spread
             return spread.toList()
         }
 
         fun display() {
-            if (navigated){
-                print(type)
-            } else if (enclosed){
-                print("I")
-            } else if (infected){
-                print(".")
-            }else {
-                print("?")
-            }
+            print(type)
         }
 
     }
     fun joinPipes() {
-        grid.forEach {
-            it.forEach { linkPipe(it) }
+        for (y in 0..grid.size-1){
+            for (x in 0 .. grid[0].size-1){
+                val pipe = grid[y][x]
+                if (x > 0) {
+                    pipe.leftPipe = grid[y][x-1]
+                }
+                if (x < grid[0].size - 2) {
+                    pipe.rightPipe = grid[y][x+1]
+                }
+                if (y > 0) {
+                    pipe.topPipe = grid[y-1][x]
+                }
+                if (y < grid.size - 2) {
+                    pipe.bottomPipe = grid[y+1][x]
+                }
+            }
+        }
+
+        for (y in 0..grid.size-1) {
+            for (x in 0..grid[0].size - 1) {
+                linkPipe(getPipe(x,y)!!,x,y )
+            }
         }
     }
 
@@ -251,26 +102,7 @@ class Day10(private val grid: List<List<Pipe>>) {
         return grid[y][x];
     }
 
-    private fun linkPipe(pipe: Pipe) {
-        if (pipe.x > 0) {
-            pipe.leftPipe = getPipe(pipe.x - 1, pipe.y)
-        }
-        if (pipe.y > 0) {
-            pipe.topPipe = getPipe(pipe.x, pipe.y - 1)
-        }
-        if (pipe.x < grid[0].size - 2) {
-            pipe.rightPipe = getPipe(pipe.x + 1, pipe.y)
-        }
-        if (pipe.y < grid.size - 2) {
-            pipe.bottomPipe = getPipe(pipe.x, pipe.y + 1)
-        }
-
-        if (pipe.type == '.') {
-            pipe.topGap = true
-            pipe.leftGap = true
-            pipe.rightGap = true
-            pipe.bottomGap = true
-        }
+    private fun linkPipe(pipe: Pipe, x: Int, y:Int) {
         if (pipe.type == 'S') {
             var joiningPipes = mutableListOf<Pipe>()
             var topPipe = pipe.topPipe
@@ -299,44 +131,32 @@ class Day10(private val grid: List<List<Pipe>>) {
         }
 
         if (pipe.type == '|') {
-            pipe.previousPipe = getPipe(pipe.x, pipe.y - 1)
-            pipe.nextPipe = getPipe(pipe.x, pipe.y + 1)
-            pipe.leftGap = true
-            pipe.rightGap = true
+            pipe.previousPipe = getPipe(x, y - 1)
+            pipe.nextPipe = getPipe(x, y + 1)
         }
         if (pipe.type == '-') {
-            pipe.previousPipe = getPipe(pipe.x - 1, pipe.y)
-            pipe.nextPipe = getPipe(pipe.x + 1, pipe.y)
-            pipe.topGap = true
-            pipe.bottomGap = true
+            pipe.previousPipe = getPipe(x - 1, y)
+            pipe.nextPipe = getPipe(x + 1, y)
         }
 
         if (pipe.type == 'L') {
-            pipe.previousPipe = getPipe(pipe.x, pipe.y - 1)
-            pipe.nextPipe = getPipe(pipe.x + 1, pipe.y)
-            pipe.leftGap = true
-            pipe.bottomGap = true
+            pipe.previousPipe = getPipe(x, y - 1)
+            pipe.nextPipe = getPipe(x + 1, y)
         }
 
         if (pipe.type == 'J') {
-            pipe.previousPipe = getPipe(pipe.x, pipe.y - 1)
-            pipe.nextPipe = getPipe(pipe.x - 1, pipe.y)
-            pipe.bottomGap = true
-            pipe.rightGap = true
+            pipe.previousPipe = getPipe(x, y - 1)
+            pipe.nextPipe = getPipe(x - 1, y)
         }
 
         if (pipe.type == '7') {
-            pipe.previousPipe = getPipe(pipe.x - 1, pipe.y)
-            pipe.nextPipe = getPipe(pipe.x, pipe.y + 1)
-            pipe.topGap = true
-            pipe.rightGap = true
+            pipe.previousPipe = getPipe(x - 1, y)
+            pipe.nextPipe = getPipe(x, y + 1)
         }
 
         if (pipe.type == 'F') {
-            pipe.previousPipe = getPipe(pipe.x + 1, pipe.y)
-            pipe.nextPipe = getPipe(pipe.x, pipe.y + 1)
-            pipe.topGap = true
-            pipe.leftGap = true
+            pipe.previousPipe = getPipe(x + 1, y)
+            pipe.nextPipe = getPipe(x, y + 1)
         }
     }
 
@@ -370,15 +190,19 @@ class Day10(private val grid: List<List<Pipe>>) {
     }
 
     fun startInfection() {
-        currentInfection = grid.flatten().filter { isEdge(it) && !it.navigated }
-        currentInfection.filter { it.rightPipe== null }.forEach { it.infectFromRight() }
-        currentInfection.filter { it.topPipe== null }.forEach { it.infectFromTop() }
-        currentInfection.filter { it.bottomPipe == null }.forEach { it.infectFromBottom() }
-        currentInfection.filter { it.leftPipe== null }.forEach { it.infectFromLeft() }
+        for (y in 0..grid.size-1) {
+            for (x in 0..grid[0].size - 1) {
+                val pipe = getPipe(x,y)!!
+                if (isEdge(x,y) && !pipe.navigated){
+                    pipe.infected = true
+                }
+            }
+        }
+        currentInfection = grid.flatten().filter { it.infected }
     }
 
-    private fun isEdge(it: Pipe): Boolean {
-        return it.x==0 || it.x == grid[0].size-1 || it.y==0 || it.y == grid.size-1
+    private fun isEdge(x: Int, y:Int): Boolean {
+        return x==0 || x == grid[0].size-1 || y==0 || y == grid.size-1
     }
 
     fun spreadToEnd(){
@@ -396,5 +220,110 @@ class Day10(private val grid: List<List<Pipe>>) {
     fun getEnclosedTiles(): Int {
         grid.flatten().filter { !it.infected && !it.navigated && it.type!= 'S'}.forEach { it.enclosed = true }
         return grid.flatten().filter { it.enclosed }.size
+    }
+
+    fun clearPipes() {
+        grid.flatten().filter { !it.navigated }.forEach { it.type='.' }
+    }
+
+    fun expand() {
+        // for the grid every row is trippled in size
+        // with Gaps " "
+        println(grid.size)
+          grid = grid.flatMapIndexed { index: Int, pipes: List<Pipe> ->
+              expandRow(pipes,index*3)
+          }
+        println(grid.size)
+    }
+
+    private fun expandRow(row: List<Pipe>, startY: Int) : List<List<Pipe>> {
+        val rowBefore = mutableListOf<Pipe>()
+        val currentRow = mutableListOf<Pipe>()
+        val rowAfter = mutableListOf<Pipe>()
+
+        for (x in 0..row.size-1){
+            val existingPipe = row[x]
+            when (existingPipe.type){
+                '.'-> {
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                }
+                '-'-> {
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe('-'))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe('-'))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                }
+                '|'->{
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe('|'))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe('|'))
+                    rowAfter.add(Pipe(' '))
+                }
+                'F'->{
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe('-'))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe('|'))
+                    rowAfter.add(Pipe(' '))
+                }
+                'J'->{
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe('|'))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe('-'))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                }
+                'L'->{
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe('|'))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe('-'))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                }
+                '7'->{
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe('-'))
+                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe('|'))
+                    rowAfter.add(Pipe(' '))
+                }
+            }
+
+        }
+        return listOf(rowBefore, currentRow, rowAfter)
     }
 }
