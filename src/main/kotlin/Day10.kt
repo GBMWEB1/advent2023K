@@ -5,11 +5,11 @@ class Day10(private var grid: List<List<Pipe>>) {
     companion object{
 
 
-        fun of(data: List<String>): Day10{
+        fun of(lines: List<String>): Day10{
             val pipes = mutableListOf<List<Pipe>>()
-            for (y in 0.. data.size-1){
-                var row = mutableListOf<Pipe>()
-                data[y].forEachIndexed { x, c ->
+            for (line in lines){
+                val row = mutableListOf<Pipe>()
+                line.forEach { c ->
                     row.add(Pipe(c))
                 }
                 pipes.add(row)
@@ -18,8 +18,8 @@ class Day10(private var grid: List<List<Pipe>>) {
         }
     }
 
-    class Pipe(var type : Char){
-        var navigated =false
+    class Pipe(var type : Char, var navigated: Boolean = false, val gap: Boolean = false){
+
         var enclosed: Boolean = false
 
         var infected: Boolean = false
@@ -31,6 +31,10 @@ class Day10(private var grid: List<List<Pipe>>) {
         var bottomPipe : Pipe? = null
         var leftPipe : Pipe? = null
         var rightPipe : Pipe? = null
+
+        private fun canBeInfected(): Boolean{
+            return !navigated && !infected
+        }
 
         fun next(): Pipe {
             if (nextPipe!= null){
@@ -49,26 +53,47 @@ class Day10(private var grid: List<List<Pipe>>) {
         fun navigate(oldPipe: Pipe): Pipe {
             navigated = true
             if (next()== oldPipe){
-                return prev();
+                return prev()
             }
             return next()
         }
 
         fun spreadInfection() : List<Pipe>{
-            var spread = mutableListOf<Pipe>()
+            val spread = mutableListOf<Pipe>()
 
-            // need to right code to spread
+            if (topPipe!= null && topPipe!!.canBeInfected()) {
+                spread.add(topPipe!!)
+            }
+
+            if (bottomPipe!= null && bottomPipe!!.canBeInfected()) {
+                spread.add(bottomPipe!!)
+            }
+
+            if (leftPipe!= null && leftPipe!!.canBeInfected()) {
+                spread.add(leftPipe!!)
+            }
+            if (rightPipe!= null && rightPipe!!.canBeInfected()) {
+                spread.add(rightPipe!!)
+            }
+
+            spread.forEach { it.infected= true }
             return spread.toList()
         }
 
         fun display() {
-            print(type)
+            if (infected){
+                print('I')
+            } else if (enclosed) {
+                print('O')
+            } else{
+                print(type)
+            }
         }
 
     }
     fun joinPipes() {
-        for (y in 0..grid.size-1){
-            for (x in 0 .. grid[0].size-1){
+        for (y in grid.indices){
+            for (x in 0..<grid[0].size){
                 val pipe = grid[y][x]
                 if (x > 0) {
                     pipe.leftPipe = grid[y][x-1]
@@ -85,8 +110,8 @@ class Day10(private var grid: List<List<Pipe>>) {
             }
         }
 
-        for (y in 0..grid.size-1) {
-            for (x in 0..grid[0].size - 1) {
+        for (y in grid.indices) {
+            for (x in 0..<grid[0].size) {
                 linkPipe(getPipe(x,y)!!,x,y )
             }
         }
@@ -94,33 +119,33 @@ class Day10(private var grid: List<List<Pipe>>) {
 
     fun getPipe(x: Int, y:Int): Pipe? {
         if (y== grid.size || y ==-1){
-            return null;
+            return null
         }
         if (x== grid[0].size || x ==-1){
-            return null;
+            return null
         }
-        return grid[y][x];
+        return grid[y][x]
     }
 
     private fun linkPipe(pipe: Pipe, x: Int, y:Int) {
         if (pipe.type == 'S') {
-            var joiningPipes = mutableListOf<Pipe>()
-            var topPipe = pipe.topPipe
+            val joiningPipes = mutableListOf<Pipe>()
+            val topPipe = pipe.topPipe
             if (topPipe != null && (topPipe.type == '|' || topPipe.type == '7' || topPipe.type == 'F')) {
                 joiningPipes.add(topPipe)
             }
 
-            var bottomPipe = pipe.bottomPipe
+            val bottomPipe = pipe.bottomPipe
             if (bottomPipe != null && (bottomPipe.type == '|' || bottomPipe.type == 'L' || bottomPipe.type == 'J')) {
                 joiningPipes.add(bottomPipe)
             }
 
-            var leftPipe = pipe.leftPipe
+            val leftPipe = pipe.leftPipe
             if (leftPipe != null && (leftPipe.type == '-' || leftPipe.type == 'L' || leftPipe.type == 'F')) {
                 joiningPipes.add(leftPipe)
             }
 
-            var rightPipe = pipe.rightPipe
+            val rightPipe = pipe.rightPipe
             if (rightPipe != null && (rightPipe.type == '-' || rightPipe.type == '7' || rightPipe.type == 'J')) {
                 joiningPipes.add(rightPipe)
             }
@@ -138,42 +163,38 @@ class Day10(private var grid: List<List<Pipe>>) {
             pipe.previousPipe = getPipe(x - 1, y)
             pipe.nextPipe = getPipe(x + 1, y)
         }
-
         if (pipe.type == 'L') {
             pipe.previousPipe = getPipe(x, y - 1)
             pipe.nextPipe = getPipe(x + 1, y)
         }
-
         if (pipe.type == 'J') {
             pipe.previousPipe = getPipe(x, y - 1)
             pipe.nextPipe = getPipe(x - 1, y)
         }
-
         if (pipe.type == '7') {
             pipe.previousPipe = getPipe(x - 1, y)
             pipe.nextPipe = getPipe(x, y + 1)
         }
-
         if (pipe.type == 'F') {
             pipe.previousPipe = getPipe(x + 1, y)
             pipe.nextPipe = getPipe(x, y + 1)
         }
     }
 
-    fun getStartingPipe(): Pipe {
+    private fun getStartingPipe(): Pipe {
         return grid.flatten().find { it.type=='S'}!!
     }
 
     fun navigate(): Int {
-        var previous = getStartingPipe();
+        var previous = getStartingPipe()
         previous.navigated = true
-        var f1 = previous.next();
+        var f1 = previous.next()
         f1.navigated=true
 
-        var steps =1;
+        var steps =1
         while (f1.type != 'S'){
 
-            var next = f1.navigate(previous)
+            val next = f1.navigate(previous)
             previous = f1
             f1 = next
             steps++
@@ -184,14 +205,14 @@ class Day10(private var grid: List<List<Pipe>>) {
     fun display() {
         println()
         grid.forEach {
-            it.forEach { it.display() }
+            it.forEach { pipe -> pipe.display() }
             println()
         }
     }
 
     fun startInfection() {
-        for (y in 0..grid.size-1) {
-            for (x in 0..grid[0].size - 1) {
+        for (y in grid.indices) {
+            for (x in 0..<grid[0].size) {
                 val pipe = getPipe(x,y)!!
                 if (isEdge(x,y) && !pipe.navigated){
                     pipe.infected = true
@@ -206,119 +227,121 @@ class Day10(private var grid: List<List<Pipe>>) {
     }
 
     fun spreadToEnd(){
-        while (currentInfection.size>0){
+        while (currentInfection.isNotEmpty()){
             spreadInfection()
         }
-       grid.flatten().filter { !it.infected && !it.navigated && it.type!= 'S'}.forEach { it.enclosed = true }
+        grid.flatten().forEach { it.enclosed=false }
+        grid.flatten()
+            .filter { it.type!=' ' && !it.gap }
+            .filter { !it.infected && !it.navigated }
+            .forEach { it.enclosed = true }
     }
 
     fun spreadInfection(){
-        var nextInfected = currentInfection.flatMap { it.spreadInfection() }
+        val nextInfected = currentInfection.flatMap { it.spreadInfection() }
         currentInfection = nextInfected
     }
 
     fun getEnclosedTiles(): Int {
-        grid.flatten().filter { !it.infected && !it.navigated && it.type!= 'S'}.forEach { it.enclosed = true }
         return grid.flatten().filter { it.enclosed }.size
     }
 
-    fun clearPipes() {
-        grid.flatten().filter { !it.navigated }.forEach { it.type='.' }
+    fun expand(startPipe: Char) {
+        getStartingPipe().type= startPipe
+        grid = grid.flatMap{ pipes: List<Pipe> ->
+          expandRow(pipes)
+        }
+        joinPipes()
     }
 
-    fun expand() {
-        // for the grid every row is trippled in size
-        // with Gaps " "
-        println(grid.size)
-          grid = grid.flatMapIndexed { index: Int, pipes: List<Pipe> ->
-              expandRow(pipes,index*3)
-          }
-        println(grid.size)
-    }
-
-    private fun expandRow(row: List<Pipe>, startY: Int) : List<List<Pipe>> {
+    private fun expandRow(row: List<Pipe>) : List<List<Pipe>> {
         val rowBefore = mutableListOf<Pipe>()
         val currentRow = mutableListOf<Pipe>()
         val rowAfter = mutableListOf<Pipe>()
 
-        for (x in 0..row.size-1){
-            val existingPipe = row[x]
-            when (existingPipe.type){
-                '.'-> {
+        for (pipe in row) {
+            when (pipe.type) {
+                '.' -> {
                     rowBefore.add(Pipe(' '))
                     rowBefore.add(Pipe(' '))
                     rowBefore.add(Pipe(' '))
                     currentRow.add(Pipe(' '))
-                    currentRow.add(existingPipe)
-                    currentRow.add(Pipe(' '))
-                    rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe(' '))
-                }
-                '-'-> {
-                    rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe(' '))
-                    currentRow.add(Pipe('-'))
-                    currentRow.add(existingPipe)
-                    currentRow.add(Pipe('-'))
-                    rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe(' '))
-                }
-                '|'->{
-                    rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe('|'))
-                    rowBefore.add(Pipe(' '))
-                    currentRow.add(Pipe(' '))
-                    currentRow.add(existingPipe)
-                    currentRow.add(Pipe(' '))
-                    rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe('|'))
-                    rowAfter.add(Pipe(' '))
-                }
-                'F'->{
-                    rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe(' '))
-                    currentRow.add(Pipe(' '))
-                    currentRow.add(existingPipe)
-                    currentRow.add(Pipe('-'))
-                    rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe('|'))
-                    rowAfter.add(Pipe(' '))
-                }
-                'J'->{
-                    rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe('|'))
-                    rowBefore.add(Pipe(' '))
-                    currentRow.add(Pipe('-'))
-                    currentRow.add(existingPipe)
+                    currentRow.add(pipe)
                     currentRow.add(Pipe(' '))
                     rowAfter.add(Pipe(' '))
                     rowAfter.add(Pipe(' '))
                     rowAfter.add(Pipe(' '))
                 }
-                'L'->{
+
+                '-' -> {
                     rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe('|'))
                     rowBefore.add(Pipe(' '))
-                    currentRow.add(Pipe(' '))
-                    currentRow.add(existingPipe)
-                    currentRow.add(Pipe('-'))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe('-', pipe.navigated, true))
+                    currentRow.add(pipe)
+                    currentRow.add(Pipe('-', pipe.navigated, true))
                     rowAfter.add(Pipe(' '))
                     rowAfter.add(Pipe(' '))
                     rowAfter.add(Pipe(' '))
                 }
-                '7'->{
+
+                '|' -> {
                     rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe('|', pipe.navigated, true))
                     rowBefore.add(Pipe(' '))
-                    rowBefore.add(Pipe(' '))
-                    currentRow.add(Pipe('-'))
-                    currentRow.add(existingPipe)
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(pipe)
                     currentRow.add(Pipe(' '))
                     rowAfter.add(Pipe(' '))
-                    rowAfter.add(Pipe('|'))
+                    rowAfter.add(Pipe('|', pipe.navigated, true))
+                    rowAfter.add(Pipe(' '))
+                }
+
+                'F' -> {
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(pipe)
+                    currentRow.add(Pipe('-', pipe.navigated, true))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe('|', pipe.navigated, true))
+                    rowAfter.add(Pipe(' '))
+                }
+
+                'J' -> {
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe('|', pipe.navigated, true))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe('-', pipe.navigated, true))
+                    currentRow.add(pipe)
+                    currentRow.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                }
+
+                'L' -> {
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe('|', pipe.navigated, true))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe(' '))
+                    currentRow.add(pipe)
+                    currentRow.add(Pipe('-', pipe.navigated, true))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                }
+
+                '7' -> {
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    rowBefore.add(Pipe(' '))
+                    currentRow.add(Pipe('-', pipe.navigated, true))
+                    currentRow.add(pipe)
+                    currentRow.add(Pipe(' '))
+                    rowAfter.add(Pipe(' '))
+                    rowAfter.add(Pipe('|', pipe.navigated, true))
                     rowAfter.add(Pipe(' '))
                 }
             }

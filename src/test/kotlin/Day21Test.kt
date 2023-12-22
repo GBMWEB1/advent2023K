@@ -130,9 +130,9 @@ class Day21Test {
 
         // size of grid is 11
         // 39/50 = 50
-        // 45/56/67/78/89/100 = 100 (mod 1)
-        // 46/57/68/79/90  = 101 (mod 2)
-        // 38/49/60/71 = 500 (mode 5)
+        // 45/56/67/78/89/100 = 100 (mod 11=1)
+        // 46/57/68/79/90  = 101 (mod 11=2)
+        // 38/49/60/71 = 500 (mod 11=5)
         val target = 100
 
         // start the sample at a multiple of the grid (with a mod of the board size)

@@ -1,10 +1,9 @@
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class Day10Test {
 
-    var sample1 = listOf(
+    private var sample1 = listOf(
         ".....",
         ".S-7.",
         ".|.|.",
@@ -40,12 +39,6 @@ class Day10Test {
         assertEquals('7', pipe.type)
         assertEquals('-', pipe.prev().type)
         assertEquals('|', pipe.next().type)
-//        assertEquals(1, grid.startX);
-//        assertEquals(1, grid.startY);
-//        val startPositions = grid.getStartPositions(1,1)
-//        assertEquals(2, startPositions.size)
-//        assertTrue(startPositions.contains(Pair(2,1)))
-//        assertTrue(startPositions.contains(Pair(1,2)))
     }
 
     @Test
@@ -56,12 +49,6 @@ class Day10Test {
     }
 
     @Test
-    fun Navigate() {
-        val grid = Day10.of(sample1)
-        grid.joinPipes()
-        assertEquals(4, grid.navigate())
-    }
-    @Test
     fun part1() {
         val data = Util().readData("day10.txt")
         val grid = Day10.of(data)
@@ -71,7 +58,7 @@ class Day10Test {
     }
     @Test
     fun samplePart2(){
-        var grid = Day10.of(listOf(
+        val grid = Day10.of(listOf(
             "...........",
             ".S-------7.",
             ".|F-----7|.",
@@ -84,9 +71,9 @@ class Day10Test {
         ))
         grid.joinPipes()
         grid.navigate()
-        grid.expand()
+        grid.expand('F')
         grid.display()
-        grid.startInfection();
+        grid.startInfection()
         grid.spreadToEnd()
         grid.display()
         assertEquals(4, grid.getEnclosedTiles())
@@ -94,7 +81,7 @@ class Day10Test {
 
     @Test
     fun samplePart2GapSpreadUp(){
-        var grid = Day10.of(listOf(
+        val grid = Day10.of(listOf(
             "..........",
             ".S------7.",
             ".|F----7|.",
@@ -107,7 +94,8 @@ class Day10Test {
         ))
         grid.joinPipes()
         grid.navigate()
-        grid.startInfection();
+        grid.expand('F')
+        grid.startInfection()
         grid.spreadInfection()
         grid.spreadInfection()
         grid.spreadInfection()
@@ -119,7 +107,7 @@ class Day10Test {
 
     @Test
     fun samplePart2GapSpreadLeft(){
-        var grid = Day10.of(listOf(
+        val grid = Day10.of(listOf(
             "..........",
             ".S------7.",
             ".|.F---7|.",
@@ -132,21 +120,15 @@ class Day10Test {
         grid.display()
         grid.joinPipes()
         grid.navigate()
-        grid.startInfection();
-        grid.spreadInfection()
-        grid.display()
-        grid.spreadInfection()
-        grid.display()
-        grid.spreadInfection()
-        grid.display()
-
+        grid.expand('F')
+        grid.startInfection()
         grid.spreadToEnd()
         grid.display()
         assertEquals(2, grid.getEnclosedTiles())
     }
     @Test
     fun samplePart2Gap2() {
-        var grid = Day10.of(
+        val grid = Day10.of(
             listOf(
                 ".F----7F7F7F7F-7....",
                 ".|F--7||||||||FJ....",
@@ -162,25 +144,22 @@ class Day10Test {
         )
         grid.joinPipes()
         grid.navigate()
-        grid.startInfection();
-        grid.display()
+        grid.expand('F')
+        grid.startInfection()
+
         grid.spreadInfection()
-        grid.display()
         grid.spreadInfection()
-        grid.display()
         grid.spreadInfection()
-        grid.display()
         grid.spreadInfection()
-        grid.display()
         grid.spreadInfection()
-        grid.display()
         grid.spreadInfection()
+        grid.spreadToEnd()
         grid.display()
         assertEquals(8, grid.getEnclosedTiles())
     }
     @Test
     fun samplePart2Gap3() {
-        var grid = Day10.of(
+        val grid = Day10.of(
             listOf(
                 "FF7FSF7F7F7F7F7F---7",
                 "L|LJ||||||||||||F--J",
@@ -196,7 +175,8 @@ class Day10Test {
         )
         grid.joinPipes()
         grid.navigate()
-        grid.startInfection();
+        grid.expand('7')
+        grid.startInfection()
         grid.spreadToEnd()
         grid.display()
         assertEquals(10, grid.getEnclosedTiles())
@@ -207,19 +187,11 @@ class Day10Test {
         val grid = Day10.of(data)
         grid.joinPipes()
         grid.navigate()
-        grid.clearPipes()
+        grid.expand('|')
         grid.startInfection()
         grid.spreadToEnd()
         grid.display()
 
-        //681 (Too high)
-        //653 too high
-        // 378 not right
-        assertEquals(378, grid.getEnclosedTiles())
+        assertEquals(367, grid.getEnclosedTiles())
     }
-
-    // Double resolution
-    //             ...
-    //  F becomes  .F-
-    //             .|.
 }
