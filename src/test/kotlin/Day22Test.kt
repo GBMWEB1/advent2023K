@@ -87,6 +87,16 @@ class Day22Test {
         stack.settle()
         stack.linkBricks()
 
-        assertEquals(428, stack.countCascadingBricks())
+        assertEquals(7, stack.countCascadingBricks())
+    }
+
+    @Test
+    fun part2() {
+        val data = Util().readData("day22.txt")
+        var stack = Day22(Day22.Brick.of(data))
+        stack.settle()
+        stack.linkBricks()
+        //1173 is too low
+        assertEquals(7, stack.countCascadingBricks())
     }
 }

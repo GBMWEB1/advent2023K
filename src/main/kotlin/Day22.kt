@@ -5,10 +5,8 @@ class Day22(val bricks: List<Brick>) {
         }
         val otherBricks = bricks.dropWhile { it==brick }
         val justBelow = otherBricks.filter { it.end[2] +1 == brick.start[2] }
-        if (justBelow.size>0){
-            if (justBelow.any { it.interest(brick) }){
-                return false
-            }
+        if (justBelow.any { it.interest(brick) }){
+            return false
         }
         return true
     }
@@ -54,13 +52,16 @@ class Day22(val bricks: List<Brick>) {
     }
 
     private fun countCascadingBrick(brick: Day22.Brick): Int {
-        var bricks = mutableSetOf<Day22.Brick>();
         if (brick.supports.size==0){
-            return bricks.size;
+            return 0
         }
-        // get all the bricks that I support, and all the others support.
-        //
-        return 0;
+        var bricksCollapsed = mutableSetOf<Brick>()
+        var bricksToCollapse = brick.cascadeDrop(bricksCollapsed)
+        while(bricksToCollapse.size>0){
+            bricksToCollapse = bricksToCollapse.flatMap { it.cascadeDrop(bricksCollapsed) }
+            bricksToCollapse = bricksToCollapse.sortedBy { it.start[2] }
+        }
+        return bricksCollapsed.size
     }
 
 
@@ -105,8 +106,23 @@ class Day22(val bricks: List<Brick>) {
         fun drop(){
             start[2] = start[2]-1
             end[2] = end[2]-1
-
         }
+
+        fun cascadeDrop(bricksCollapsed: MutableSet<Brick>): List<Brick>{
+            if (supportedBy.all { bricksCollapsed.contains(it) }){
+                bricksCollapsed.add(this)
+                return supports
+            }
+            return listOf()
+        }
+
+
+        fun getAllSupports(): Set<Brick>{
+            val childSupports =  supports.flatMap { it.getAllSupports() }.toMutableSet()
+            childSupports.add(this)
+            return childSupports
+        }
+
 
         companion object{
             fun of (data: List<String>): List<Brick>{

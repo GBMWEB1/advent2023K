@@ -6,11 +6,27 @@ class Day23 {
         NORTH,
         SOUTH,
         EAST,
-        WEST
+        WEST;
+
+        fun opposite(): Direction {
+            return when (this){
+                NORTH -> SOUTH
+                SOUTH -> NORTH
+                EAST -> WEST
+                WEST -> EAST
+            }
+        }
     }
 
-    class Node(val x:Int = 0, val y: Int=0){
-        // There may be a path either North, South, East, West
+    class Node(val x:Int = 0, val y: Int=0, val directions: List<Direction>){
+        val distances : MutableMap<Direction, Pair<Node, Int>> = mutableMapOf()
+        fun recordDistance(direction: Direction, steps: Int, endNode: Node) {
+            distances[direction] = Pair(endNode, steps)
+        }
+
+        fun getAvailableDirections(): List<Direction> {
+            return directions.filter { !distances.containsKey(it) }
+        }
     }
 
     class Grid(val cells: List<String>, val slippySlopes: Boolean)
@@ -20,9 +36,12 @@ class Day23 {
         private fun calculateNodes(): List<Node> {
             var nodes = mutableListOf<Node>()
 
-            nodes.add(Node(cells[0].indexOfFirst { it=='.' },0))
+            nodes.add(Node(cells[0].indexOfFirst { it=='.' },0, listOf(Direction.SOUTH)))
             for (row in cells.indices){
                 for (col in cells[row].indices){
+                    if (col==11 && row==3){
+                        println()
+                    }
                     val cell = cells[row][col]
                     if (cell == '#'){
                         continue
@@ -47,11 +66,11 @@ class Day23 {
                         directions.add(Direction.WEST)
                     }
                     if (directions.size>2){
-                        nodes.add(Node(col, row))
+                        nodes.add(Node(col, row, directions))
                     }
                 }
             }
-            nodes.add(Node(cells.last().indexOfFirst { it=='.' },cells.size-1))
+            nodes.add(Node(cells.last().indexOfFirst { it=='.' },cells.size-1, listOf(Direction.NORTH)))
             return nodes
         }
 
@@ -106,42 +125,68 @@ class Day23 {
         }
     }
 
-    class Hike(val steps: MutableList<Pair<Int,Int>>, val direction: Direction){
+    class Hike(
+        val startingNode : Node,
+        val startingDirection : Direction,
+        var steps: MutableList<Pair<Int,Int>>,
+        var lastDirection: Direction){
+
         fun getSteps(): Int {
             return steps.size-1
         }
 
         fun takeStep(grid:Grid) : List<Hike>{
             val currentStep = steps.last()
-            if (atEnd(grid)){
-                return listOf(this)
-            }
             val hikes = mutableListOf<Hike>()
+
             val south = Pair(currentStep.first, currentStep.second+1)
-            if (grid.canGo(south, Direction.SOUTH) && !steps.contains(south)){
-                val newList = this.steps.toList().toMutableList()
-                newList.add(south)
-                hikes.add(Hike(newList, Direction.SOUTH))
-            }
-
             val north = Pair(currentStep.first, currentStep.second-1)
-            if (grid.canGo(north, Direction.NORTH) && !steps.contains(north)){
-                val newList = this.steps.toList().toMutableList()
-                newList.add(north)
-                hikes.add(Hike(newList, Direction.NORTH))
-            }
-
             val east = Pair(currentStep.first+1, currentStep.second)
-            if (grid.canGo(east, Direction.EAST) && !steps.contains(east)){
-                val newList = this.steps.toList().toMutableList()
-                newList.add(east)
-                hikes.add(Hike(newList, Direction.EAST))
-            }
             val west = Pair(currentStep.first-1, currentStep.second)
-            if (grid.canGo(west, Direction.WEST) && !steps.contains(west)){
-                val newList = this.steps.toList().toMutableList()
-                newList.add(west)
-                hikes.add(Hike(newList, Direction.WEST))
+
+            // Check if I am at a node
+            val node = grid.nodes.find { it.x == currentStep.first && it.y== currentStep.second }
+            if (node!= null&& currentStep.second>0){
+                //if we are at a node, record the steps from the last node to this node
+                this.startingNode.recordDistance(startingDirection, getSteps(), node)
+                node.recordDistance(lastDirection.opposite(), getSteps(), startingNode)
+                steps = mutableListOf();
+                // for this node, set in the directions not yet done
+                val availableDirection = node.getAvailableDirections()
+                if (availableDirection.contains(Direction.SOUTH)){
+                    val steps = mutableListOf(currentStep,south)
+                    hikes.add(Hike(node, Direction.SOUTH, steps, Direction.SOUTH))
+                }
+                if (availableDirection.contains(Direction.NORTH)){
+                    val steps = mutableListOf(currentStep, north)
+                    hikes.add(Hike(node, Direction.NORTH, steps, Direction.NORTH))
+                }
+                if (availableDirection.contains(Direction.EAST)){
+                    val steps = mutableListOf(currentStep,east)
+                    hikes.add(Hike(node, Direction.EAST, steps, Direction.EAST))
+                }
+                if (availableDirection.contains(Direction.WEST)){
+                    val steps = mutableListOf(currentStep,west)
+                    hikes.add(Hike(node, Direction.WEST, steps, Direction.WEST))
+                }
+            } else{
+                hikes.add(this)
+                if (grid.canGo(south, Direction.SOUTH) && !steps.contains(south)){
+                    steps.add(south)
+                    lastDirection = Direction.SOUTH
+                }
+                if (grid.canGo(north, Direction.NORTH) && !steps.contains(north)){
+                    steps.add(north)
+                    lastDirection = Direction.NORTH
+                }
+                if (grid.canGo(east, Direction.EAST) && !steps.contains(east)){
+                    steps.add(east)
+                    lastDirection = Direction.EAST
+                }
+                if (grid.canGo(west, Direction.WEST) && !steps.contains(west)){
+                    steps.add(west)
+                    lastDirection = Direction.WEST
+                }
             }
             // using the current location (i.e. the last step)
             return hikes
@@ -154,24 +199,13 @@ class Day23 {
 
     companion object {
         fun calculateHikes(grid: Grid, prune: Boolean): Int {
-            val firstStep = grid.cells[0].indexOfFirst { it=='.' }
-            val initialHike = Hike(mutableListOf(Pair(firstStep,0)),Direction.SOUTH)
+            val initialNode = grid.nodes.first()
+            val initialHike = Hike(initialNode, Direction.SOUTH, mutableListOf(Pair(initialNode.x, initialNode.y)), Direction.SOUTH)
             var hikes = listOf(initialHike)
-            var maxTimesAtEnd = 0;
-            var times=0
             while ( hikes.isNotEmpty()){
                 hikes = hikes.flatMap { it.takeStep(grid) }
-                times++
-                if (hikes.any { it.atEnd(grid) }) {
-                    hikes = hikes.filter { !it.atEnd(grid) }
-                    maxTimesAtEnd = times
-                }
-                if (hikes.size>60000){
-                    println("big")
-                }
-                println(hikes.size)
             }
-            return maxTimesAtEnd
+            return 0
         }
 
         fun getLongestHikes(hikes: List<Hike>): Int {
